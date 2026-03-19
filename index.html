@@ -2,22 +2,94 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Contenu du fichier CSV</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Base de données récupérée - Chat Gamer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        h1 {
+            color: #4caf50;
+        }
+        p.context {
+            max-width: 700px;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 900px;
+            background-color: #1e1e1e;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px 12px;
+            text-align: left;
+            font-family: monospace;
+        }
+        th {
+            background-color: #333;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #2a2a2a;
+        }
+        .error {
+            color: #ff5555;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>Contenu du fichier CSV</h1>
-    <pre id="csvContent">Chargement du contenu...</pre>
+    <h1>Base de données récupérée - Ancien site de chat gamer</h1>
+    <p class="context">
+        Dans le cadre de notre enquête OSINT, nous avons mis la main sur une base de données CSV provenant d'un ancien site de chat dédié aux gamers, nommé <em>GameChatRoom</em>. 
+        Ce fichier contient des logs de conversations, des pseudos d'utilisateurs, leurs timestamps et quelques métadonnées. 
+        L'objectif est d'analyser ces données pour en extraire des informations utiles sur les interactions entre joueurs, potentiellement liées à des événements suspects.
+    </p>
+
+    <h2>Contenu du fichier <code>gamechatroom.csv</code> :</h2>
+    <div id="csvTableContainer">Chargement du contenu...</div>
 
     <script>
-        // Fonction pour charger et afficher le contenu du CSV
+        // Fonction pour convertir CSV en tableau HTML
+        function csvToTable(csvText) {
+            const lines = csvText.trim().split('\n');
+            if (lines.length === 0) return '<p class="error">Fichier CSV vide.</p>';
+
+            const headers = lines[0].split(',');
+            let html = '<table><thead><tr>';
+            headers.forEach(header => {
+                html += `<th>${header.trim()}</th>`;
+            });
+            html += '</tr></thead><tbody>';
+
+            for (let i = 1; i < lines.length; i++) {
+                const cells = lines[i].split(',');
+                html += '<tr>';
+                cells.forEach(cell => {
+                    html += `<td>${cell.trim()}</td>`;
+                });
+                html += '</tr>';
+            }
+            html += '</tbody></table>';
+            return html;
+        }
+
+        // Charger le fichier CSV et afficher sous forme de tableau
         fetch('gamechatroom.csv')
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) throw new Error('Fichier non trouvé ou inaccessible');
+                return response.text();
+            })
             .then(data => {
-                document.getElementById('csvContent').textContent = data;
+                document.getElementById('csvTableContainer').innerHTML = csvToTable(data);
             })
             .catch(error => {
-                document.getElementById('csvContent').textContent = 'Erreur lors du chargement du fichier.';
+                document.getElementById('csvTableContainer').innerHTML = `<p class="error">Erreur lors du chargement du fichier : ${error.message}</p>`;
                 console.error('Erreur:', error);
             });
     </script>
