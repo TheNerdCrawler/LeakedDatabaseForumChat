@@ -3,11 +3,23 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Fichier CSV Game Chat Room</title>
+    <title>Contenu du fichier CSV</title>
 </head>
 <body>
-    <h1>Vous pouvez accéder au fichier CSV ci-dessous</h1>
-    <p>Cliquez sur le lien ci-dessous pour télécharger le fichier :</p>
-    <a href="gamechatroom.csv" download>Download gamechatroom.csv</a>
+    <h1>Contenu du fichier CSV</h1>
+    <pre id="csvContent">Chargement du contenu...</pre>
+
+    <script>
+        // Fonction pour charger et afficher le contenu du CSV
+        fetch('gamechatroom.csv')
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('csvContent').textContent = data;
+            })
+            .catch(error => {
+                document.getElementById('csvContent').textContent = 'Erreur lors du chargement du fichier.';
+                console.error('Erreur:', error);
+            });
+    </script>
 </body>
 </html>
